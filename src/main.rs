@@ -20,16 +20,15 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().build().map_err(|x| x.to_string())?;
     let texture_creator = canvas.texture_creator();
 
-    let width = 256;
-    let height = 256;
+    let img_width = 256;
+    let img_height = 256;
     let mut texture = texture_creator
-        .create_texture_streaming(RGB24, width, height)
+        .create_texture_streaming(RGB24, img_width, img_height)
         .map_err(|x| x.to_string())?;
 
     texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-        render(buffer, pitch, width, height);
+        render(buffer, pitch, img_width, img_height);
     })?;
-
 
     let mut event_pump = sdl_context.event_pump()?;
 
@@ -42,9 +41,13 @@ fn main() -> Result<(), String> {
                 }
                 _ => {}
             }
-        canvas.copy(&texture, None, Some(Rect::new(100, 100, width, height)))?;
-        canvas.present();
-       }
+            canvas.copy(
+                &texture,
+                None,
+                Some(Rect::new(100, 100, img_width, img_height)),
+            )?;
+            canvas.present();
+        }
     }
 
     Ok(())
