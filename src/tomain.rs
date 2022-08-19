@@ -6,6 +6,8 @@ pub type Point = Vector3<f32>;
 
 mod color;
 use color::writecolor;
+mod ray;
+use ray::Ray;
 
 pub fn render(
     buffer: &mut [u8],
