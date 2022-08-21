@@ -1,5 +1,7 @@
 use sdl2::{
-    event::Event, keyboard::Scancode, pixels::PixelFormatEnum::RGB24,
+    event::{Event, WindowEvent},
+    keyboard::Scancode,
+    pixels::PixelFormatEnum::RGB24,
     rect::Rect,
 };
 
@@ -70,29 +72,41 @@ fn main() -> Result<(), String> {
     texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
         render(buffer, pitch, &constants);
     })?;
+    canvas.copy(
+        &texture,
+        None,
+        Some(Rect::new(0, 0, 2*constants.img_width, 2*constants.img_height)),
+    )?;
+    canvas.present();
 
     let mut event_pump = sdl_context.event_pump()?;
 
     'running: loop {
         for event in event_pump.wait_iter() {
+            use Scancode::Escape;
+            use WindowEvent::{Maximized, Resized};
+
             match event {
                 Event::Quit { .. }
-                | Event::KeyDown { scancode: Some(Scancode::Escape), .. } => {
+                | Event::KeyDown { scancode: Some(Escape), .. } => {
                     break 'running
+                }
+                Event::Window { win_event: Resized(..), .. }
+                | Event::Window { win_event: Maximized, .. } => {
+                    canvas.copy(
+                        &texture,
+                        None,
+                        Some(Rect::new(
+                            0,
+                            0,
+                            2*constants.img_width,
+                            2*constants.img_height,
+                        )),
+                    )?;
+                    canvas.present();
                 }
                 _ => {}
             }
-            canvas.copy(
-                &texture,
-                None,
-                Some(Rect::new(
-                    0,
-                    0,
-                    constants.img_width,
-                    constants.img_height,
-                )),
-            )?;
-            canvas.present();
         }
     }
 
