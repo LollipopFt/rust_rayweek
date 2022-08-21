@@ -33,15 +33,17 @@ pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
 }
 
 fn ray_color(r: &Ray) -> Color {
-    if hit_sphere(&Point::new(0., 0., -1.), 0.5, r) {
-        return Color::new(1., 0., 0.);
+    let t = hit_sphere(&Point::new(0., 0., -1.), 0.5, r);
+    if t > 0. {
+        let n = (r.at(t) - Vector::new(0., 0., -1.)).normalize();
+        return 0.5 * Color::new(n.x + 1., n.y + 1., n.z + 1.);
     }
     let unit_dir = r.dir.normalize();
-    let a = 0.5 * unit_dir.y + 1.;
-    (1. - a) * Color::new(1., 1., 1.) + a * Color::new(0.6, 0.8, 1.)
+    let a = 0.5 * (unit_dir.y + 1.);
+    (1. - a) * Color::new(1., 1., 1.) + a * Color::new(0.5, 0.7, 1.)
 }
 
-fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> bool {
+fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> f32 {
     // ray equation: P(t) = A + tb
     // in a sphere: (P(t)-C)∙(P(t)-C) = r² => (A+tb-C)∙(a+tb-C) = r²
     // t²b∙b + 2tb∙(A-C) + (A-C)∙(A-C) = r²
@@ -51,5 +53,9 @@ fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> bool {
     let b = 2. * oc.dot(&r.dir);
     let c = oc.dot(&oc) - radius*radius;
     let discriminant = b*b - 4.*a*c;
-    discriminant > 0.
+    if discriminant < 0. {
+        -1.
+    } else {
+        (-b - discriminant.sqrt()) / (2. * a)
+    }
 }
