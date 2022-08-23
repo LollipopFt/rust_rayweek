@@ -1,5 +1,6 @@
 use super::{
     hittable::{Hit, HitRecord},
+    ray::Ray,
     Point,
 };
 
@@ -15,12 +16,7 @@ impl Sphere {
 }
 
 impl Hit for Sphere {
-    fn hit(
-        &self,
-        r: &super::ray::Ray,
-        ray_tmin: f32,
-        ray_tmax: f32,
-    ) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_tmin: f32, ray_tmax: f32) -> Option<HitRecord> {
         let oc = r.origin - self.ctr;
         let a = r.dir.norm_squared();
         let half_b = oc.dot(&r.dir);
@@ -41,8 +37,7 @@ impl Hit for Sphere {
         }
 
         let mut rec =
-            HitRecord { t: root, p: r.at(root), ..Default::default()
-        };
+            HitRecord { t: root, p: r.at(root), ..Default::default() };
         let outward_normal = (rec.p - self.ctr) / self.r;
         rec.set_face_normal(r, outward_normal);
         Some(rec)

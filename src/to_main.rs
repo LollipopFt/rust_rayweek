@@ -10,6 +10,7 @@ mod ray;
 use ray::Ray;
 mod hittable;
 mod sphere;
+mod hittable_list;
 
 use crate::Constants;
 
