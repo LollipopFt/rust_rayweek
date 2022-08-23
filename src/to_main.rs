@@ -8,6 +8,8 @@ mod color;
 use color::writecolor;
 mod ray;
 use ray::Ray;
+mod hittable;
+mod sphere;
 
 use crate::Constants;
 
