@@ -40,7 +40,11 @@ impl Hit for Sphere {
             }
         }
 
-        let p = r.at(root);
-        Some(HitRecord { t: root, p, normal: (p - self.ctr) / self.r })
+        let mut rec =
+            HitRecord { t: root, p: r.at(root), ..Default::default()
+        };
+        let outward_normal = (rec.p - self.ctr) / self.r;
+        rec.set_face_normal(r, outward_normal);
+        Some(rec)
     }
 }
