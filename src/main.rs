@@ -6,7 +6,7 @@ use sdl2::{
 };
 
 mod to_main;
-use to_main::{render, Point, Vector};
+use to_main::{render, HittableList, Point, Sphere, Vector};
 
 #[derive(Default)]
 pub struct Constants {
@@ -14,6 +14,9 @@ pub struct Constants {
     aspect_ratio: f32,
     img_width: u32,
     img_height: u32,
+
+    // world
+    world: HittableList,
 
     // camera
     viewport_height: f32,
@@ -47,6 +50,12 @@ fn main() -> Result<(), String> {
     constants.img_height =
         (constants.img_width as f32 / constants.aspect_ratio) as u32;
 
+    // world
+    constants.world = HittableList::new();
+    constants.world.push(Box::new(Sphere::new(Point::new(0., 0., -1.), 0.5)));
+    constants
+        .world
+        .push(Box::new(Sphere::new(Point::new(0., -100.5, -1.), 100.)));
     // camera
     constants.viewport_height = 2.;
     constants.viewport_width =
@@ -75,7 +84,12 @@ fn main() -> Result<(), String> {
     canvas.copy(
         &texture,
         None,
-        Some(Rect::new(0, 0, 2*constants.img_width, 2*constants.img_height)),
+        Some(Rect::new(
+            0,
+            0,
+            2 * constants.img_width,
+            2 * constants.img_height,
+        )),
     )?;
     canvas.present();
 
@@ -99,8 +113,8 @@ fn main() -> Result<(), String> {
                         Some(Rect::new(
                             0,
                             0,
-                            2*constants.img_width,
-                            2*constants.img_height,
+                            2 * constants.img_width,
+                            2 * constants.img_height,
                         )),
                     )?;
                     canvas.present();

@@ -4,19 +4,23 @@ use super::{
     Point,
 };
 
-struct Sphere {
-    ctr: Point,
-    r: f32,
+pub struct Sphere {
+    pub ctr: Point,
+    pub r: f32,
 }
 
 impl Sphere {
-    fn new(ctr: Point, r: f32) -> Self {
+    pub fn new(ctr: Point, r: f32) -> Self {
         Sphere { ctr, r }
     }
 }
 
 impl Hit for Sphere {
     fn hit(&self, r: &Ray, ray_tmin: f32, ray_tmax: f32) -> Option<HitRecord> {
+        // ray equation: P(t) = A + tb
+        // in a sphere: (P(t)-C)∙(P(t)-C) = r² => (A+tb-C)∙(a+tb-C) = r²
+        // t²b∙b + 2tb∙(A-C) + (A-C)∙(A-C) = r²
+        // a: b∙b, b: 2b∙(A-C), c: (A-C)∙(A-C) - r²
         let oc = r.origin - self.ctr;
         let a = r.dir.norm_squared();
         let half_b = oc.dot(&r.dir);

@@ -1,5 +1,5 @@
 use nalgebra::Vector3;
-use std::io::Write;
+use std::{f32::INFINITY, io::Write};
 pub type Color = Vector3<f32>;
 pub type Vector = Vector3<f32>;
 pub type Point = Vector3<f32>;
@@ -9,8 +9,11 @@ use color::writecolor;
 mod ray;
 use ray::Ray;
 mod hittable;
-mod sphere;
+pub use hittable::Hit;
 mod hittable_list;
+pub use hittable_list::HittableList;
+mod sphere;
+pub use sphere::Sphere;
 
 use crate::Constants;
 
@@ -28,37 +31,18 @@ pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
                 c.lower_left + s * c.horizontal + (1. - t) * c.vertical
                     - c.origin,
             );
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &c.world);
             writecolor(buffer, pitch, i, j, pixel_color, tonemap);
         }
     }
     eprintln!("\ndone.");
 }
 
-fn ray_color(r: &Ray) -> Color {
-    let t = hit_sphere(&Point::new(0., 0., -1.), 0.5, r);
-    if t > 0. {
-        let n = (r.at(t) - Vector::new(0., 0., -1.)).normalize();
-        return 0.5 * Color::new(n.x + 1., n.y + 1., n.z + 1.);
+fn ray_color(r: &Ray, world: &HittableList) -> Color {
+    if let Some(rec) = world.hit(r, 0., INFINITY) {
+        return 0.5 * (rec.normal + Color::new(1., 1., 1.));
     }
     let unit_dir = r.dir.normalize();
     let a = 0.5 * (unit_dir.y + 1.);
     (1. - a) * Color::new(1., 1., 1.) + a * Color::new(0.5, 0.7, 1.)
-}
-
-fn hit_sphere(center: &Point, radius: f32, r: &Ray) -> f32 {
-    // ray equation: P(t) = A + tb
-    // in a sphere: (P(t)-C)∙(P(t)-C) = r² => (A+tb-C)∙(a+tb-C) = r²
-    // t²b∙b + 2tb∙(A-C) + (A-C)∙(A-C) = r²
-    // a: b∙b, b: 2b∙(A-C), c: (A-C)∙(A-C) - r²
-    let oc = r.origin - center;
-    let a = r.dir.norm_squared();
-    let half_b = oc.dot(&r.dir);
-    let c = oc.norm_squared() - radius*radius;
-    let discriminant = half_b*half_b - a*c;
-    if discriminant < 0. {
-        -1.
-    } else {
-        (-half_b - discriminant.sqrt()) / a
-    }
 }
