@@ -1,7 +1,7 @@
 use super::{
     hittable::{Hit, HitRecord},
     ray::Ray,
-    Point,
+    Point, interval::Interval,
 };
 
 pub struct Sphere {
@@ -16,7 +16,7 @@ impl Sphere {
 }
 
 impl Hit for Sphere {
-    fn hit(&self, r: &Ray, ray_tmin: f32, ray_tmax: f32) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
         // ray equation: P(t) = A + tb
         // in a sphere: (P(t)-C)∙(P(t)-C) = r² => (A+tb-C)∙(a+tb-C) = r²
         // t²b∙b + 2tb∙(A-C) + (A-C)∙(A-C) = r²
@@ -33,9 +33,9 @@ impl Hit for Sphere {
         let sqrtd = discriminant.sqrt();
 
         let mut root = (-half_b - sqrtd) / a;
-        if root < ray_tmin || ray_tmax < root {
+        if !ray_t.contains(root) {
             root = (-half_b + sqrtd) / a;
-            if root < ray_tmin || ray_tmax < root {
+            if !ray_t.contains(root) {
                 return None;
             }
         }

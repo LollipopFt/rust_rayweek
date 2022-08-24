@@ -14,6 +14,8 @@ mod hittable_list;
 pub use hittable_list::HittableList;
 mod sphere;
 pub use sphere::Sphere;
+mod interval;
+use interval::Interval;
 
 use crate::Constants;
 
@@ -39,7 +41,7 @@ pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
 }
 
 fn ray_color(r: &Ray, world: &HittableList) -> Color {
-    if let Some(rec) = world.hit(r, 0., INFINITY) {
+    if let Some(rec) = world.hit(r, Interval::new(0., INFINITY)) {
         return 0.5 * (rec.normal + Color::new(1., 1., 1.));
     }
     let unit_dir = r.dir.normalize();

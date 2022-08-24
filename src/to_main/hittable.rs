@@ -1,4 +1,4 @@
-use super::{ray::Ray, Point, Vector};
+use super::{ray::Ray, Point, Vector, interval::Interval};
 
 #[derive(Default)]
 pub struct HitRecord {
@@ -21,5 +21,5 @@ impl HitRecord {
 }
 
 pub trait Hit {
-    fn hit(&self, r: &Ray, ray_tmin: f32, ray_tmax: f32) -> Option<HitRecord>;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord>;
 }

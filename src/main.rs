@@ -56,6 +56,7 @@ fn main() -> Result<(), String> {
     constants
         .world
         .push(Box::new(Sphere::new(Point::new(0., -100.5, -1.), 100.)));
+
     // camera
     constants.viewport_height = 2.;
     constants.viewport_width =
