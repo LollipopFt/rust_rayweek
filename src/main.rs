@@ -6,7 +6,7 @@ use sdl2::{
 };
 
 mod to_main;
-use to_main::{render, HittableList, Point, Sphere, Vector};
+use to_main::{render, HittableList, Point, Sphere, Vector, Camera};
 
 #[derive(Default)]
 pub struct Constants {
@@ -14,15 +14,13 @@ pub struct Constants {
     aspect_ratio: f32,
     img_width: u32,
     img_height: u32,
+    samples_per_pixel: u32,
 
     // world
     world: HittableList,
 
     // camera
-    viewport_height: f32,
-    viewport_width: f32,
-    focal_length: f32,
-
+    cam: Camera,
     origin: Point,
     horizontal: Vector,
     vertical: Vector,
@@ -34,10 +32,12 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let window = video_subsystem
-        .window("raytrace", 1280, 720)
+        .window("raytrace", 800, 450)
         .position_centered()
-        .resizable()
         .vulkan()
+        .resizable()
+        .maximized()
+        .allow_highdpi()
         .build()
         .map_err(|x| x.to_string())?;
     let mut canvas = window.into_canvas().build().map_err(|x| x.to_string())?;
@@ -49,6 +49,7 @@ fn main() -> Result<(), String> {
     constants.img_width = 400;
     constants.img_height =
         (constants.img_width as f32 / constants.aspect_ratio) as u32;
+    constants.samples_per_pixel = 100;
 
     // world
     constants.world = HittableList::new();
@@ -58,18 +59,18 @@ fn main() -> Result<(), String> {
         .push(Box::new(Sphere::new(Point::new(0., -100.5, -1.), 100.)));
 
     // camera
-    constants.viewport_height = 2.;
-    constants.viewport_width =
-        constants.aspect_ratio * constants.viewport_height;
-    constants.focal_length = 1.;
+    let viewport_height = 2.;
+    let viewport_width =
+        constants.aspect_ratio * viewport_height;
+    let focal_length = 1.;
 
     constants.origin = Point::new(0., 0., 0.);
-    constants.horizontal = Vector::new(constants.viewport_width, 0., 0.);
-    constants.vertical = Vector::new(0., constants.viewport_height, 0.);
+    constants.horizontal = Vector::new(viewport_width, 0., 0.);
+    constants.vertical = Vector::new(0., viewport_height, 0.);
     constants.lower_left = constants.origin
         - constants.horizontal / 2.
         - constants.vertical / 2.
-        - Vector::new(0., 0., constants.focal_length);
+        - Vector::new(0., 0., focal_length);
 
     let mut texture = texture_creator
         .create_texture_streaming(

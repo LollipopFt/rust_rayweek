@@ -1,4 +1,5 @@
 use nalgebra::Vector3;
+use rand::Rng;
 use std::{f32::INFINITY, io::Write};
 pub type Color = Vector3<f32>;
 pub type Vector = Vector3<f32>;
@@ -16,25 +17,28 @@ mod sphere;
 pub use sphere::Sphere;
 mod interval;
 use interval::Interval;
+mod camera;
+pub use camera::Camera;
 
 use crate::Constants;
 
 pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
-    let tonemap: f32 = 255.999;
     let c = constants;
+    let mut rng = rand::thread_rng();
     for j in 0..c.img_height {
         eprint!("\rscanlines remaining: {}", c.img_width - j);
         std::io::stderr().flush().ok();
         for i in 0..c.img_width {
-            let s = i as f32 / (c.img_width as f32 - 1.);
-            let t = j as f32 / (c.img_height as f32 - 1.);
-            let r = Ray::new(
-                c.origin,
-                c.lower_left + s * c.horizontal + (1. - t) * c.vertical
-                    - c.origin,
-            );
-            let pixel_color = ray_color(&r, &c.world);
-            writecolor(buffer, pitch, i, j, pixel_color, tonemap);
+            let mut pixel_color = Color::new(0., 0., 0.);
+            for _ in 0..c.samples_per_pixel {
+                let s =
+                    (i as f32 + rng.gen::<f32>()) / (c.img_width - 1) as f32;
+                let t =
+                    (j as f32 + rng.gen::<f32>()) / (c.img_height - 1) as f32;
+                let r = c.cam.get_ray(s, t);
+                pixel_color += ray_color(&r, &c.world);
+            }
+            writecolor(buffer, pitch, i, j, pixel_color, c.samples_per_pixel);
         }
     }
     eprintln!("\ndone.");
