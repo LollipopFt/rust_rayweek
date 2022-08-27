@@ -19,8 +19,10 @@ mod interval;
 use interval::Interval;
 mod camera;
 pub use camera::Camera;
+mod vec3;
+use vec3::random_in_unit_sphere;
 
-use crate::Constants;
+use super::Constants;
 
 pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
     let c = constants;
@@ -46,7 +48,8 @@ pub fn render(buffer: &mut [u8], pitch: usize, constants: &Constants) {
 
 fn ray_color(r: &Ray, world: &HittableList) -> Color {
     if let Some(rec) = world.hit(r, Interval::new(0., INFINITY)) {
-        return 0.5 * (rec.normal + Color::new(1., 1., 1.));
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world);
     }
     let unit_dir = r.dir.normalize();
     let a = 0.5 * (unit_dir.y + 1.);
