@@ -15,6 +15,7 @@ pub struct Constants {
     img_width: u32,
     img_height: u32,
     samples_per_pixel: u32,
+    max_depth: u8,
 
     // world
     world: HittableList,
@@ -50,6 +51,7 @@ fn main() -> Result<(), String> {
     constants.img_height =
         (constants.img_width as f32 / constants.aspect_ratio) as u32;
     constants.samples_per_pixel = 100;
+    constants.max_depth = 25;
 
     // world
     constants.world = HittableList::new();
