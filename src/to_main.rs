@@ -51,7 +51,7 @@ fn ray_color(r: &Ray, world: &HittableList, depth: u8) -> Color {
         return Color::new(0., 0., 0.);
     }
 
-    if let Some(rec) = world.hit(r, Interval::new(0., INFINITY)) {
+    if let Some(rec) = world.hit(r, Interval::new(0.001, INFINITY)) {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return 0.5
             * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1);
