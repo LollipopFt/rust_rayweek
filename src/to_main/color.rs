@@ -12,10 +12,11 @@ pub fn writecolor(
     let g = pixel_color.y;
     let b = pixel_color.z;
 
+    // divide color by number of samples & gamma correct for gamma = 2
     let scale = 1. / samples_per_pixel as f32;
-    let r = r * scale;
-    let g = g * scale;
-    let b = b * scale;
+    let r = (r * scale).sqrt();
+    let g = (g * scale).sqrt();
+    let b = (b * scale).sqrt();
 
     let intensity = Interval::new(0., 0.999);
     let offset = y as usize * pitch + x as usize * 3;

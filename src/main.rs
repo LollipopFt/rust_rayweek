@@ -51,7 +51,7 @@ fn main() -> Result<(), String> {
     constants.img_height =
         (constants.img_width as f32 / constants.aspect_ratio) as u32;
     constants.samples_per_pixel = 100;
-    constants.max_depth = 25;
+    constants.max_depth = 10;
 
     // world
     constants.world = HittableList::new();
