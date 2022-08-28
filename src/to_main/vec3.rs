@@ -31,3 +31,7 @@ pub fn random_in_unit_sphere() -> Vector3<f32> {
         return p;
     }
 }
+
+pub fn random_unit_vector() -> Vector3<f32> {
+    random_in_unit_sphere().normalize()
+}
