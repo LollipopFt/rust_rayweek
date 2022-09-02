@@ -6,7 +6,7 @@ use sdl2::{
 };
 
 mod to_main;
-use to_main::{render, HittableList, Point, Sphere, Vector, Camera};
+use to_main::{render, Camera, HittableList, Point, Sphere, Vector};
 
 #[derive(Default)]
 pub struct Constants {
@@ -62,8 +62,7 @@ fn main() -> Result<(), String> {
 
     // camera
     let viewport_height = 2.;
-    let viewport_width =
-        constants.aspect_ratio * viewport_height;
+    let viewport_width = constants.aspect_ratio * viewport_height;
     let focal_length = 1.;
 
     constants.origin = Point::new(0., 0., 0.);

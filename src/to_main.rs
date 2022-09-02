@@ -21,6 +21,7 @@ mod camera;
 pub use camera::Camera;
 mod vec3;
 use vec3::random_unit_vector;
+mod material;
 
 use super::Constants;
 
