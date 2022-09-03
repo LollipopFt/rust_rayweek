@@ -1,17 +1,22 @@
+use std::rc::Rc;
+
 use super::{
     hittable::{Hit, HitRecord},
+    interval::Interval,
+    material::Material,
     ray::Ray,
-    Point, interval::Interval,
+    Point, Vector,
 };
 
 pub struct Sphere {
     pub ctr: Point,
     pub r: f32,
+    pub mat: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(ctr: Point, r: f32) -> Self {
-        Sphere { ctr, r }
+    pub fn new(ctr: Point, r: f32, mat: Rc<dyn Material>) -> Self {
+        Sphere { ctr, r, mat }
     }
 }
 
@@ -40,8 +45,13 @@ impl Hit for Sphere {
             }
         }
 
-        let mut rec =
-            HitRecord { t: root, p: r.at(root), ..Default::default() };
+        let mut rec = HitRecord {
+            p: r.at(root),
+            t: root,
+            mat: self.mat.clone(),
+            normal: Vector::default(),
+            front_face: bool::default(),
+        };
         let outward_normal = (rec.p - self.ctr) / self.r;
         rec.set_face_normal(r, outward_normal);
         Some(rec)
