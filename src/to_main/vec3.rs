@@ -1,12 +1,13 @@
 use nalgebra::Vector3;
 use rand::Rng;
 
-trait Random {
+pub trait Extensions {
     fn random() -> Self;
     fn rand(min: f32, max: f32) -> Self;
+    fn near_zero(&self) -> bool;
 }
 
-impl Random for Vector3<f32> {
+impl Extensions for Vector3<f32> {
     fn random() -> Self {
         let mut rng = rand::thread_rng();
         Vector3::new(rng.gen(), rng.gen(), rng.gen())
@@ -19,6 +20,11 @@ impl Random for Vector3<f32> {
             rng.gen_range(min..max),
             rng.gen_range(min..max),
         )
+    }
+
+    fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self[0].abs() < s && self[1].abs() < s && self[2].abs() < s
     }
 }
 
