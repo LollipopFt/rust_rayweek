@@ -20,6 +20,7 @@ use interval::Interval;
 mod camera;
 pub use camera::Camera;
 mod material;
+pub use material::{Lambertian, Metal};
 mod vec3;
 
 use super::Constants;

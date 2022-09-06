@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use sdl2::{
     event::{Event, WindowEvent},
     keyboard::Scancode,
@@ -6,7 +8,10 @@ use sdl2::{
 };
 
 mod to_main;
-use to_main::{render, Camera, HittableList, Point, Sphere, Vector};
+use to_main::{
+    render, Camera, Color, HittableList, Lambertian, Metal, Point, Sphere,
+    Vector,
+};
 
 #[derive(Default)]
 pub struct Constants {
@@ -55,10 +60,31 @@ fn main() -> Result<(), String> {
 
     // world
     constants.world = HittableList::new();
-    constants.world.push(Box::new(Sphere::new(Point::new(0., 0., -1.), 0.5)));
-    constants
-        .world
-        .push(Box::new(Sphere::new(Point::new(0., -100.5, -1.), 100.)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.3)));
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+
+    constants.world.push(Box::new(Sphere::new(
+        Point::new(0., -100.5, -1.),
+        100.,
+        material_ground,
+    )));
+    constants.world.push(Box::new(Sphere::new(
+        Point::new(0., 0., -1.),
+        0.5,
+        material_center,
+    )));
+    constants.world.push(Box::new(Sphere::new(
+        Point::new(-1., 0., -1.),
+        0.5,
+        material_left,
+    )));
+    constants.world.push(Box::new(Sphere::new(
+        Point::new(1., 0., -1.),
+        0.5,
+        material_right,
+    )));
 
     // camera
     let viewport_height = 2.;
