@@ -1,6 +1,8 @@
 use nalgebra::Vector3;
 use rand::Rng;
 
+use super::Vector;
+
 pub trait Extensions {
     fn random() -> Self;
     fn rand(min: f32, max: f32) -> Self;
@@ -40,4 +42,8 @@ pub fn random_in_unit_sphere() -> Vector3<f32> {
 
 pub fn random_unit_vector() -> Vector3<f32> {
     random_in_unit_sphere().normalize()
+}
+
+pub fn reflect(v: &Vector, n: &Vector) -> Vector {
+    v - 2. * v.dot(n) * n
 }

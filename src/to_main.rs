@@ -19,9 +19,8 @@ mod interval;
 use interval::Interval;
 mod camera;
 pub use camera::Camera;
-mod vec3;
-use vec3::random_unit_vector;
 mod material;
+mod vec3;
 
 use super::Constants;
 
@@ -53,9 +52,15 @@ fn ray_color(r: &Ray, world: &HittableList, depth: u8) -> Color {
     }
 
     if let Some(rec) = world.hit(r, Interval::new(0.001, INFINITY)) {
-        let target = rec.p + rec.normal + random_unit_vector();
-        return 0.5
-            * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1);
+        if let Some((attentuation, scattered)) = rec.mat.scatter(r, &rec) {
+            return attentuation.component_mul(&ray_color(
+                &scattered,
+                world,
+                depth - 1,
+            ));
+        } else {
+            return Color::default();
+        }
     }
 
     let unit_dir = r.dir.normalize();
