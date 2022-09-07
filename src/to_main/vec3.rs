@@ -7,6 +7,7 @@ pub trait Extensions {
     fn random() -> Self;
     fn rand(min: f32, max: f32) -> Self;
     fn near_zero(&self) -> bool;
+    fn refract(&self, n: &Vector, etai_over_etat: f32) -> Self;
 }
 
 impl Extensions for Vector3<f32> {
@@ -27,6 +28,14 @@ impl Extensions for Vector3<f32> {
     fn near_zero(&self) -> bool {
         let s = 1e-8;
         self[0].abs() < s && self[1].abs() < s && self[2].abs() < s
+    }
+
+    fn refract(&self, n: &Vector, etai_over_etat: f32) -> Self {
+        let cos_theta = (-self).dot(n).min(1.);
+        let r_out_perp = etai_over_etat * (self + cos_theta * n);
+        let r_out_parallel =
+            -((1. - r_out_perp.norm_squared()).abs().sqrt()) * n;
+        r_out_perp + r_out_parallel
     }
 }
 
