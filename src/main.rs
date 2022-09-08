@@ -78,6 +78,11 @@ fn main() -> Result<(), String> {
     constants.world.push(Box::new(Sphere::new(
         Point::new(-1., 0., -1.),
         0.5,
+        material_left.clone(),
+    )));
+    constants.world.push(Box::new(Sphere::new(
+        Point::new(-1., 0., -1.),
+        -0.4,
         material_left,
     )));
     constants.world.push(Box::new(Sphere::new(
