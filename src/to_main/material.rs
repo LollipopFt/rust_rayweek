@@ -1,3 +1,5 @@
+use rand::Rng;
+
 use super::{
     hittable::HitRecord,
     ray::Ray,
@@ -74,7 +76,10 @@ impl Material for Dielectric {
         let sin_theta = (1. - cos_theta * cos_theta).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.;
-        let direction = if cannot_refract {
+        let direction = if cannot_refract
+            || reflectance(cos_theta, refraction_ratio)
+                > rand::thread_rng().gen::<f32>()
+        {
             unit_dir.reflect(&rec.normal)
         } else {
             unit_dir.refract(&rec.normal, refraction_ratio)
@@ -88,4 +93,10 @@ impl Dielectric {
     pub fn new(ir: f32) -> Self {
         Dielectric { ir }
     }
+}
+
+fn reflectance(cosine: f32, ref_idx: f32) -> f32 {
+    let r0 = (1. - ref_idx) / (1. + ref_idx);
+    let r0 = r0 * r0;
+    r0 + (1. - r0) * (1. - cosine).powi(5)
 }
