@@ -1,7 +1,7 @@
 use super::{
     hittable::HitRecord,
     ray::Ray,
-    vec3::{random_in_unit_sphere, random_unit_vector, reflect},
+    vec3::{random_in_unit_sphere, random_unit_vector},
     Color,
 };
 use crate::to_main::vec3::Extensions;
@@ -49,7 +49,7 @@ impl Metal {
 
 impl Material for Metal {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
-        let reflected = reflect(&r_in.dir.normalize(), &rec.normal);
+        let reflected = r_in.dir.normalize().reflect(&rec.normal);
         let scattered =
             Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
         if scattered.dir.dot(&rec.normal) > 0. {
@@ -70,9 +70,17 @@ impl Material for Dielectric {
             if rec.front_face { 1. / self.ir } else { self.ir };
 
         let unit_dir = r_in.dir.normalize();
-        let refracted = unit_dir.refract(&rec.normal, refraction_ratio);
+        let cos_theta = (-unit_dir).dot(&rec.normal).min(1.);
+        let sin_theta = (1. - cos_theta * cos_theta).sqrt();
 
-        Some((Color::new(1., 1., 1.), Ray::new(rec.p, refracted)))
+        let cannot_refract = refraction_ratio * sin_theta > 1.;
+        let direction = if cannot_refract {
+            unit_dir.reflect(&rec.normal)
+        } else {
+            unit_dir.refract(&rec.normal, refraction_ratio)
+        };
+
+        Some((Color::new(1., 1., 1.), Ray::new(rec.p, direction)))
     }
 }
 

@@ -8,6 +8,7 @@ pub trait Extensions {
     fn rand(min: f32, max: f32) -> Self;
     fn near_zero(&self) -> bool;
     fn refract(&self, n: &Vector, etai_over_etat: f32) -> Self;
+    fn reflect(&self, n: &Vector) -> Self;
 }
 
 impl Extensions for Vector3<f32> {
@@ -37,6 +38,9 @@ impl Extensions for Vector3<f32> {
             -((1. - r_out_perp.norm_squared()).abs().sqrt()) * n;
         r_out_perp + r_out_parallel
     }
+    fn reflect(&self, n: &Vector) -> Vector {
+        self - 2. * self.dot(n) * n
+    }
 }
 
 pub fn random_in_unit_sphere() -> Vector3<f32> {
@@ -51,8 +55,4 @@ pub fn random_in_unit_sphere() -> Vector3<f32> {
 
 pub fn random_unit_vector() -> Vector3<f32> {
     random_in_unit_sphere().normalize()
-}
-
-pub fn reflect(v: &Vector, n: &Vector) -> Vector {
-    v - 2. * v.dot(n) * n
 }
