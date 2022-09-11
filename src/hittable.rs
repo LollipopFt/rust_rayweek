@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use super::{interval::Interval, material::Material, ray::Ray, Point, Vector};
+use crate::{interval::Interval, material::Material, ray::Ray, Point, Vector};
 
 pub struct HitRecord {
     pub p: Point,

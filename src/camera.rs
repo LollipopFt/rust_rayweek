@@ -1,4 +1,4 @@
-use super::{ray::Ray, Point, Vector};
+use crate::{ray::Ray, Point, Vector};
 
 pub struct Camera {
     origin: Point,
@@ -18,7 +18,7 @@ impl Camera {
 }
 
 impl Default for Camera {
-     fn default() -> Self {
+    fn default() -> Self {
         const ASPECT_RATIO: f32 = 16. / 9.;
         const VIEWPORT_HEIGHT: f32 = 2.;
         const VIEWPORT_WIDTH: f32 = ASPECT_RATIO * VIEWPORT_HEIGHT;

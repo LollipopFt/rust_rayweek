@@ -22,7 +22,8 @@ impl Interval {
         }
     }
 
-    pub const EMPTY: Self = Self { min: f32::INFINITY, max: f32::NEG_INFINITY };
-    pub const UNIVERSE: Self =
-        Self { min: f32::NEG_INFINITY, max: f32::INFINITY };
+    #[allow(dead_code)]
+    const EMPTY: Self = Self { min: f32::INFINITY, max: f32::NEG_INFINITY };
+    #[allow(dead_code)]
+    const UNIVERSE: Self = Self { min: f32::NEG_INFINITY, max: f32::INFINITY };
 }

@@ -1,7 +1,9 @@
 use nalgebra::Vector3;
 use rand::Rng;
 
-use super::Vector;
+pub type Vector = Vector3<f32>;
+pub type Color = Vector3<f32>;
+pub type Point = Vector3<f32>;
 
 pub trait Extensions {
     fn random() -> Self;

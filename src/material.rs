@@ -1,12 +1,11 @@
 use rand::Rng;
 
-use super::{
+use crate::{
     hittable::HitRecord,
     ray::Ray,
-    vec3::{random_in_unit_sphere, random_unit_vector},
+    vec3::{random_in_unit_sphere, random_unit_vector, Extensions},
     Color,
 };
-use crate::to_main::vec3::Extensions;
 
 pub trait Material {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)>;

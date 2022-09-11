@@ -7,31 +7,24 @@ use sdl2::{
     rect::Rect,
 };
 
-mod to_main;
-use to_main::{
-    render, Camera, Color, Dielectric, HittableList, Lambertian, Metal, Point,
-    Sphere, Vector,
-};
+mod camera;
+mod color;
+mod hittable;
+mod hittable_list;
+mod interval;
+mod material;
+mod ray;
+mod scene;
+mod sphere;
+mod vec3;
 
-#[derive(Default)]
-pub struct Constants {
-    // image
-    aspect_ratio: f32,
-    img_width: u32,
-    img_height: u32,
-    samples_per_pixel: u32,
-    max_depth: u8,
-
-    // world
-    world: HittableList,
-
-    // camera
-    cam: Camera,
-    origin: Point,
-    horizontal: Vector,
-    vertical: Vector,
-    lower_left: Point,
-}
+use color::writecolor;
+use interval::Interval;
+use material::{Dielectric, Lambertian, Metal};
+use ray::Ray;
+use scene::Scene;
+use sphere::Sphere;
+use vec3::{Color, Point, Vector};
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -49,80 +42,65 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().build().map_err(|x| x.to_string())?;
     let texture_creator = canvas.texture_creator();
 
-    let mut constants = Constants::default();
+    let mut scene_desc = Scene::default();
     // image
-    constants.aspect_ratio = 16. / 9.;
-    constants.img_width = 400;
-    constants.img_height =
-        (constants.img_width as f32 / constants.aspect_ratio) as u32;
-    constants.samples_per_pixel = 100;
-    constants.max_depth = 10;
+    let aspect_ratio: f32 = 16. / 9.;
+    scene_desc.img_width = 400;
+    scene_desc.img_height = (scene_desc.img_width as f32 / aspect_ratio) as u32;
+    scene_desc.samples_per_pixel = 100;
 
     // world
-    constants.world = HittableList::new();
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
     let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let material_left = Rc::new(Dielectric::new(1.5));
     let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.));
 
-    constants.world.push(Box::new(Sphere::new(
+    scene_desc.world.push(Box::new(Sphere::new(
         Point::new(0., -100.5, -1.),
         100.,
         material_ground,
     )));
-    constants.world.push(Box::new(Sphere::new(
+    scene_desc.world.push(Box::new(Sphere::new(
         Point::new(0., 0., -1.),
         0.5,
         material_center,
     )));
-    constants.world.push(Box::new(Sphere::new(
+    scene_desc.world.push(Box::new(Sphere::new(
         Point::new(-1., 0., -1.),
         0.5,
         material_left.clone(),
     )));
-    constants.world.push(Box::new(Sphere::new(
+    scene_desc.world.push(Box::new(Sphere::new(
         Point::new(-1., 0., -1.),
         -0.4,
         material_left,
     )));
-    constants.world.push(Box::new(Sphere::new(
+    scene_desc.world.push(Box::new(Sphere::new(
         Point::new(1., 0., -1.),
         0.5,
         material_right,
     )));
 
-    // camera
-    let viewport_height = 2.;
-    let viewport_width = constants.aspect_ratio * viewport_height;
-    let focal_length = 1.;
-
-    constants.origin = Point::new(0., 0., 0.);
-    constants.horizontal = Vector::new(viewport_width, 0., 0.);
-    constants.vertical = Vector::new(0., viewport_height, 0.);
-    constants.lower_left = constants.origin
-        - constants.horizontal / 2.
-        - constants.vertical / 2.
-        - Vector::new(0., 0., focal_length);
-
     let mut texture = texture_creator
         .create_texture_streaming(
             RGB24,
-            constants.img_width,
-            constants.img_height,
+            scene_desc.img_width,
+            scene_desc.img_height,
         )
         .map_err(|x| x.to_string())?;
 
     texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-        render(buffer, pitch, &constants);
+        scene_desc.render(buffer, pitch);
     })?;
+
     canvas.copy(
         &texture,
         None,
         Some(Rect::new(
             0,
             0,
-            2 * constants.img_width,
-            2 * constants.img_height,
+            2 * scene_desc.img_width,
+            2 * scene_desc.img_height,
         )),
     )?;
     canvas.present();
@@ -147,8 +125,8 @@ fn main() -> Result<(), String> {
                         Some(Rect::new(
                             0,
                             0,
-                            2 * constants.img_width,
-                            2 * constants.img_height,
+                            2 * scene_desc.img_width,
+                            2 * scene_desc.img_height,
                         )),
                     )?;
                     canvas.present();

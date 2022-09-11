@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use super::{
+use crate::{
     hittable::{Hit, HitRecord},
     interval::Interval,
     material::Material,

@@ -1,4 +1,4 @@
-use super::{Color, interval::Interval};
+use crate::{interval::Interval, Color};
 
 pub fn writecolor(
     buffer: &mut [u8],

@@ -1,4 +1,4 @@
-use super::{
+use crate::{
     hittable::{Hit, HitRecord},
     interval::Interval,
     ray::Ray,
