@@ -42,12 +42,15 @@ fn main() -> Result<(), String> {
     let mut canvas = window.into_canvas().build().map_err(|x| x.to_string())?;
     let texture_creator = canvas.texture_creator();
 
-    let mut scene_desc = Scene::default();
     // image
-    let aspect_ratio: f32 = 16. / 9.;
-    scene_desc.img_width = 400;
-    scene_desc.img_height = (scene_desc.img_width as f32 / aspect_ratio) as u32;
-    scene_desc.samples_per_pixel = 100;
+    let mut scene_desc = Scene {
+        aspect_ratio: 16. / 9.,
+        img_width: 400,
+        samples_per_pixel: 100,
+        ..Default::default()
+    };
+    scene_desc.img_height =
+        (scene_desc.img_width as f32 / scene_desc.aspect_ratio) as u32;
 
     // world
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
@@ -90,6 +93,7 @@ fn main() -> Result<(), String> {
         .map_err(|x| x.to_string())?;
 
     texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
+        scene_desc.cam.init(scene_desc.aspect_ratio);
         scene_desc.render(buffer, pitch);
     })?;
 

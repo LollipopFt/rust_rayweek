@@ -8,6 +8,20 @@ pub struct Camera {
 }
 
 impl Camera {
+    pub fn init(&mut self, aspect_ratio: f32) {
+        let viewport_height = 2.;
+        let viewport_width = aspect_ratio * viewport_height;
+        let focal_length = 1.;
+
+        self.origin = Point::new(0., 0., 0.);
+        self.horizontal = Vector::new(viewport_width, 0., 0.);
+        self.vertical = Vector::new(0., viewport_height, 0.);
+        self.lower_left = self.origin
+            - self.horizontal / 2.
+            - self.vertical / 2.
+            - Vector::new(0., 0., focal_length);
+    }
+
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         Ray::new(
             self.origin,

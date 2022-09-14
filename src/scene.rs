@@ -8,6 +8,7 @@ use std::io::Write;
 
 pub struct Scene {
     // image
+    pub aspect_ratio: f32,
     pub img_width: u32,
     pub img_height: u32,
     pub samples_per_pixel: u32,
@@ -23,6 +24,7 @@ pub struct Scene {
 impl Default for Scene {
     fn default() -> Self {
         Self {
+            aspect_ratio: 1.,
             img_width: 100,
             img_height: 100,
             samples_per_pixel: 10,
@@ -37,29 +39,28 @@ impl Default for Scene {
 
 impl Scene {
     pub fn render(&self, buffer: &mut [u8], pitch: usize) {
-        let c = self;
+        let img_height = self.img_height;
+        let img_width = self.img_width;
+        let world = &self.world;
+        let max_depth = self.max_depth;
+        let samples_per_pixel = self.samples_per_pixel;
+        let cam = &self.cam;
+
         let mut rng = rand::thread_rng();
-        for j in 0..c.img_height {
-            eprint!("\rscanlines remaining: {}", c.img_width - j);
+        for j in 0..img_height {
+            eprint!("\rscanlines remaining: {}", img_width - j);
             std::io::stderr().flush().ok();
-            for i in 0..c.img_width {
+            for i in 0..img_width {
                 let mut pixel_color = Color::new(0., 0., 0.);
-                for _ in 0..c.samples_per_pixel {
-                    let s = (i as f32 + rng.gen::<f32>())
-                        / (c.img_width - 1) as f32;
-                    let t = (j as f32 + rng.gen::<f32>())
-                        / (c.img_height - 1) as f32;
-                    let r = c.cam.get_ray(s, t);
-                    pixel_color += ray_color(&r, &c.world, c.max_depth);
+                for _ in 0..samples_per_pixel {
+                    let s =
+                        (i as f32 + rng.gen::<f32>()) / (img_width - 1) as f32;
+                    let t =
+                        (j as f32 + rng.gen::<f32>()) / (img_height - 1) as f32;
+                    let r = cam.get_ray(s, t);
+                    pixel_color += ray_color(&r, world, max_depth);
                 }
-                writecolor(
-                    buffer,
-                    pitch,
-                    i,
-                    j,
-                    pixel_color,
-                    c.samples_per_pixel,
-                );
+                writecolor(buffer, pitch, i, j, pixel_color, samples_per_pixel);
             }
         }
         eprintln!("\ndone.");
