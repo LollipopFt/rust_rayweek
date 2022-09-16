@@ -5,11 +5,14 @@ pub struct Camera {
     lower_left: Point,
     horizontal: Vector,
     vertical: Vector,
+    pub vfov: f32,
 }
 
 impl Camera {
     pub fn init(&mut self, aspect_ratio: f32) {
-        let viewport_height = 2.;
+        let theta = self.vfov.to_radians();
+        let h = (theta / 2.).tan();
+        let viewport_height = 2. * h;
         let viewport_width = aspect_ratio * viewport_height;
         let focal_length = 1.;
 
@@ -33,18 +36,18 @@ impl Camera {
 
 impl Default for Camera {
     fn default() -> Self {
-        const ASPECT_RATIO: f32 = 16. / 9.;
-        const VIEWPORT_HEIGHT: f32 = 2.;
-        const VIEWPORT_WIDTH: f32 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-        const FOCAL_LENGTH: f32 = 1.;
+        let aspect_ratio: f32 = 16. / 9.;
+        let viewport_height: f32 = 2.;
+        let viewport_width: f32 = aspect_ratio * viewport_height;
+        let focal_length: f32 = 1.;
 
         let origin = Point::new(0., 0., 0.);
-        let horizontal = Vector::new(VIEWPORT_WIDTH, 0., 0.);
-        let vertical = Vector::new(0., VIEWPORT_HEIGHT, 0.);
+        let horizontal = Vector::new(viewport_width, 0., 0.);
+        let vertical = Vector::new(0., viewport_height, 0.);
         let lower_left = origin
             - horizontal / 2.
             - vertical / 2.
-            - Vector::new(0., 0., FOCAL_LENGTH);
-        Camera { origin, lower_left, horizontal, vertical }
+            - Vector::new(0., 0., focal_length);
+        Camera { origin, lower_left, horizontal, vertical, vfov: 40. }
     }
 }

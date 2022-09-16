@@ -4,7 +4,6 @@ use crate::{
 };
 use rand::Rng;
 use std::f32::INFINITY;
-use std::io::Write;
 
 pub struct Scene {
     // image
@@ -48,8 +47,6 @@ impl Scene {
 
         let mut rng = rand::thread_rng();
         for j in 0..img_height {
-            eprint!("\rscanlines remaining: {}", img_width - j);
-            std::io::stderr().flush().ok();
             for i in 0..img_width {
                 let mut pixel_color = Color::new(0., 0., 0.);
                 for _ in 0..samples_per_pixel {
