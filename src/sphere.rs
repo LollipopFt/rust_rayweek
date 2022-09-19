@@ -18,6 +18,10 @@ impl Sphere {
     pub fn new(ctr: Point, r: f32, mat: Rc<dyn Material>) -> Self {
         Sphere { ctr, r, mat }
     }
+
+    pub fn boxd(self) -> Box<Self> {
+        Box::new(self)
+    }
 }
 
 impl Hit for Sphere {

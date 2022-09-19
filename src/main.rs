@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, rc::Rc};
+use std::rc::Rc;
 
 use sdl2::{
     event::{Event, WindowEvent},
@@ -51,52 +51,34 @@ fn main() -> Result<(), String> {
     };
     scene_desc.img_height =
         (scene_desc.img_width as f32 / scene_desc.aspect_ratio) as u32;
-    scene_desc.cam.vfov = 90.;
+
+    scene_desc.cam.lookfrom = Point::new(-2., 2., 1.);
+    scene_desc.cam.lookat = Point::new(0., 0., -1.);
+    scene_desc.cam.vup = Vector::new(0., 1., 0.);
+    scene_desc.cam.vfov = 20.;
 
     // world
-    let r = (PI / 4.).cos();
-    /* let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
     let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
     let material_left = Rc::new(Dielectric::new(1.5));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.));*/
-    let material_left = Rc::new(Lambertian::new(Color::new(0., 0., 1.)));
-    let material_right = Rc::new(Lambertian::new(Color::new(1., 0., 0.)));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 0.));
 
-    /* scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(0., -100.5, -1.),
-        100.,
-        material_ground,
-    )));
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(0., 0., -1.),
-        0.5,
-        material_center,
-    )));
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(-1., 0., -1.),
-        0.5,
-        material_left.clone(),
-    )));
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(-1., 0., -1.),
-        -0.4,
-        material_left,
-    )));
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(1., 0., -1.),
-        0.5,
-        material_right,
-    ))); */
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(-r, 0., -1.),
-        r,
-        material_left,
-    )));
-    scene_desc.world.push(Box::new(Sphere::new(
-        Point::new(r, 0., -1.),
-        r,
-        material_right,
-    )));
+    scene_desc.world.push(
+        Sphere::new(Point::new(0., -100.5, -1.), 100., material_ground).boxd(),
+    );
+    scene_desc.world.push(
+        Sphere::new(Point::new(0., 0., -1.), 0.5, material_center).boxd(),
+    );
+    scene_desc.world.push(
+        Sphere::new(Point::new(-1., 0., -1.), 0.5, material_left.clone())
+            .boxd(),
+    );
+    scene_desc.world.push(
+        Sphere::new(Point::new(-1., 0., -1.), -0.4, material_left).boxd(),
+    );
+    scene_desc
+        .world
+        .push(Sphere::new(Point::new(1., 0., -1.), 0.5, material_right).boxd());
 
     let mut texture = texture_creator
         .create_texture_streaming(

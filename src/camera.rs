@@ -6,6 +6,9 @@ pub struct Camera {
     horizontal: Vector,
     vertical: Vector,
     pub vfov: f32,
+    pub lookfrom: Point,
+    pub lookat: Point,
+    pub vup: Vector,
 }
 
 impl Camera {
@@ -14,15 +17,16 @@ impl Camera {
         let h = (theta / 2.).tan();
         let viewport_height = 2. * h;
         let viewport_width = aspect_ratio * viewport_height;
-        let focal_length = 1.;
 
-        self.origin = Point::new(0., 0., 0.);
-        self.horizontal = Vector::new(viewport_width, 0., 0.);
-        self.vertical = Vector::new(0., viewport_height, 0.);
-        self.lower_left = self.origin
-            - self.horizontal / 2.
-            - self.vertical / 2.
-            - Vector::new(0., 0., focal_length);
+        let w = (self.lookfrom - self.lookat).normalize();
+        let u = self.vup.cross(&w).normalize();
+        let v = w.cross(&u);
+
+        self.origin = self.lookfrom;
+        self.horizontal = viewport_width * u;
+        self.vertical = viewport_height * v;
+        self.lower_left =
+            self.origin - self.horizontal / 2. - self.vertical / 2. - w;
     }
 
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
@@ -48,6 +52,15 @@ impl Default for Camera {
             - horizontal / 2.
             - vertical / 2.
             - Vector::new(0., 0., focal_length);
-        Camera { origin, lower_left, horizontal, vertical, vfov: 40. }
+        Camera {
+            origin,
+            lower_left,
+            horizontal,
+            vertical,
+            vfov: 40.,
+            lookfrom: Point::new(0., 0., -1.),
+            lookat: Point::new(0., 0., 0.),
+            vup: Vector::new(0., 1., 0.),
+        }
     }
 }
