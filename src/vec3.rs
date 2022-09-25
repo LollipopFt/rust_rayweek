@@ -58,3 +58,15 @@ pub fn random_in_unit_sphere() -> Vector3<f32> {
 pub fn random_unit_vector() -> Vector3<f32> {
     random_in_unit_sphere().normalize()
 }
+
+pub fn random_in_unit_disk() -> Vector {
+    let mut rng = rand::thread_rng();
+    loop {
+        let p =
+            Vector::new(rng.gen_range(-1.0..1.), rng.gen_range(-1.0..1.), 0.);
+        if p.norm_squared() >= 1. {
+            continue;
+        }
+        return p;
+    }
+}

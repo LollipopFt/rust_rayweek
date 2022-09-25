@@ -52,10 +52,13 @@ fn main() -> Result<(), String> {
     scene_desc.img_height =
         (scene_desc.img_width as f32 / scene_desc.aspect_ratio) as u32;
 
-    scene_desc.cam.lookfrom = Point::new(-2., 2., 1.);
+    scene_desc.cam.lookfrom = Point::new(3., 3., 2.);
     scene_desc.cam.lookat = Point::new(0., 0., -1.);
     scene_desc.cam.vup = Vector::new(0., 1., 0.);
     scene_desc.cam.vfov = 20.;
+    scene_desc.cam.aperture = 2.;
+    scene_desc.cam.focus_dist =
+        (scene_desc.cam.lookfrom - scene_desc.cam.lookat).norm();
 
     // world
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.)));
