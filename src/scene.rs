@@ -27,7 +27,7 @@ impl Default for Scene {
             img_width: 100,
             img_height: 100,
             samples_per_pixel: 10,
-            max_depth: 50,
+            max_depth: 10,
 
             world: HittableList::default(),
 
